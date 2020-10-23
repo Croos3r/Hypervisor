@@ -15,25 +15,25 @@ public class Hypervisor<P extends JavaPlugin> {
     private final P plugin;
     private final Logger logger;
 
-    private final ArrayList<HyperCommand> commands;
-    private final ArrayList<HyperListener<? extends Event>> listeners;
-    private final ArrayList<HyperManager> managers;
+    private ArrayList<HyperCommand> commands;
+    private ArrayList<HyperListener<? extends Event>> listeners;
+    private ArrayList<HyperManager> managers;
 
-    public Hypervisor(P plugin, ArrayList<HyperCommand> commands, ArrayList<HyperListener<? extends Event>> listeners, ArrayList<HyperManager> managers) {
+    public Hypervisor(P plugin) {
 
         this.plugin = plugin;
         this.logger = plugin.getLogger();
-
-        this.commands = commands;
-        this.listeners = listeners;
-        this.managers = managers;
     }
 
     public void init() {
 
-        managers.forEach(HyperManager::init);
-        commands.forEach(HyperCommand::register);
-        listeners.forEach(HyperListener::register);
+        if (commands != null && listeners != null && managers != null) {
+
+            managers.forEach(HyperManager::init);
+            commands.forEach(HyperCommand::register);
+            listeners.forEach(HyperListener::register);
+        }
+        else throw new IllegalStateException();
     }
 
     public P getPlugin() {
@@ -44,5 +44,18 @@ public class Hypervisor<P extends JavaPlugin> {
     public Logger getLogger() {
 
         return logger;
+    }
+
+    public void setCommands(ArrayList<HyperCommand> commands) {
+
+        this.commands = commands;
+    }
+    public void setListeners(ArrayList<HyperListener<? extends Event>> listeners) {
+
+        this.listeners = listeners;
+    }
+    public void setManagers(ArrayList<HyperManager> managers) {
+
+        this.managers = managers;
     }
 }
