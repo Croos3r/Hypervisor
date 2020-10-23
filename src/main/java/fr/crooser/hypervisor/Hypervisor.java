@@ -8,6 +8,7 @@ import org.bukkit.event.Event;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 public class Hypervisor<P extends JavaPlugin> {
@@ -15,9 +16,9 @@ public class Hypervisor<P extends JavaPlugin> {
     private final P plugin;
     private final Logger logger;
 
-    private ArrayList<HyperCommand> commands;
-    private ArrayList<HyperListener<? extends Event>> listeners;
-    private ArrayList<HyperManager> managers;
+    private HyperCommand[] commands;
+    private HyperListener<? extends Event>[] listeners;
+    private HyperManager[] managers;
 
     public Hypervisor(P plugin) {
 
@@ -27,13 +28,9 @@ public class Hypervisor<P extends JavaPlugin> {
 
     public void init() {
 
-        if (commands != null && listeners != null && managers != null) {
-
-            managers.forEach(HyperManager::init);
-            commands.forEach(HyperCommand::register);
-            listeners.forEach(HyperListener::register);
-        }
-        else throw new IllegalStateException();
+        Arrays.stream(commands).forEach(HyperCommand::register);
+        Arrays.stream(listeners).forEach(HyperListener::register);
+        Arrays.stream(managers).forEach(HyperManager::init);
     }
 
     public P getPlugin() {
@@ -46,15 +43,16 @@ public class Hypervisor<P extends JavaPlugin> {
         return logger;
     }
 
-    public void setCommands(ArrayList<HyperCommand> commands) {
+    public void setCommands(HyperCommand... commands) {
 
         this.commands = commands;
     }
-    public void setListeners(ArrayList<HyperListener<? extends Event>> listeners) {
+
+    public final void setListeners(HyperListener<?>... listeners) {
 
         this.listeners = listeners;
     }
-    public void setManagers(ArrayList<HyperManager> managers) {
+    public void setManagers(HyperManager... managers) {
 
         this.managers = managers;
     }
