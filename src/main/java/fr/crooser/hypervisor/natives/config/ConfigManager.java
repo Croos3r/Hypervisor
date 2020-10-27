@@ -33,7 +33,7 @@ public class ConfigManager extends HyperManager {
         final File              pluginDataFolder    = hypervisor.getPlugin().getDataFolder();
         final YamlConfiguration configuration       = new YamlConfiguration();
 
-        file.getConfigObjects().forEach(object -> configuration.set(object.getKey(), object.getValue()));
+        file.getConfigObjects().forEach(object -> configuration.set(object.getPath(), object.getValue()));
 
         if (!pluginDataFolder.exists()) pluginDataFolder.mkdir();
 
@@ -58,7 +58,14 @@ public class ConfigManager extends HyperManager {
 
             final YamlConfiguration configuration = YamlConfiguration.loadConfiguration(file);
 
-            file.getConfigObjects().stream().filter(object -> !object.isOptional()).forEach(object -> configuration.set(object.getKey(), object.getValue()));
+            file.getConfigObjects().forEach(object -> {
+
+                if (!object.isOptional()) {
+
+                    if (!object.isSection()) configuration.set(object.getPath(), object.getValue());
+                    else configuration.createSection(object.getPath());
+                }
+            });
 
             try {
                 configuration.save(file);

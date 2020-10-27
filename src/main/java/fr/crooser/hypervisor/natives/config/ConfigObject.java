@@ -2,19 +2,28 @@ package fr.crooser.hypervisor.natives.config;
 
 public class ConfigObject {
 
-    private final String key;
+    private final String path;
     private Object value;
     private boolean optional;
+    private final boolean section;
 
-    public ConfigObject(String key, Object value, boolean optional) {
-        this.key = key;
+    public ConfigObject(String path, Object value, boolean optional) {
+        this.path = path;
         this.value = value;
         this.optional = optional;
+        this.section = false;
+    }
+    public ConfigObject(String path, boolean optional) {
+
+        this.path = path;
+        this.optional = optional;
+        this.value = null;
+        this.section = true;
     }
 
-    public String getKey() {
+    public String getPath() {
 
-        return key;
+        return path;
     }
 
     public Object getValue() {
@@ -33,5 +42,10 @@ public class ConfigObject {
     public void setOptional(boolean optional) {
 
         this.optional = optional;
+    }
+
+    public boolean isSection() {
+
+        return section;
     }
 }
