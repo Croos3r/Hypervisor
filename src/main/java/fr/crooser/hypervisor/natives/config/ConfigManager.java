@@ -9,34 +9,33 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.List;
 
 public class ConfigManager extends HyperManager {
 
-    private final ConfigManagerOptions options;
+    private final List<ConfigFile> configFiles;
 
-    public ConfigManager(Hypervisor<? extends JavaPlugin> hypervisor, ConfigManagerOptions options) {
+    public ConfigManager(Hypervisor<? extends JavaPlugin> hypervisor, ConfigFile... configFiles) {
         super(hypervisor);
-        this.options = options;
+
+        this.configFiles = Arrays.asList(configFiles);
     }
 
     @Override
     public void init() {
 
-        options.defaultFiles.forEach(this::updateConfig);
+        configFiles.forEach(this::updateConfig);
     }
 
-    public void makeConfig(String fileName, Map<String, ?> values) {
+    public void makeConfig(ConfigFile file) {
 
         final File              pluginDataFolder    = hypervisor.getPlugin().getDataFolder();
         final YamlConfiguration configuration       = new YamlConfiguration();
 
-        values.forEach(configuration::set);
+        file.getConfigObjects().forEach(object -> configuration.set(object.getKey(), object.getValue()));
 
         if (!pluginDataFolder.exists()) pluginDataFolder.mkdir();
-
-        final File file = new File(pluginDataFolder, fileName + ".yml");
 
         if (!file.exists()) {
 
@@ -49,22 +48,17 @@ public class ConfigManager extends HyperManager {
         }
     }
 
-    public void updateConfig(String fileName, Map<String, ?> values) {
+    public void updateConfig(ConfigFile file) {
 
         final File pluginDataFolder = hypervisor.getPlugin().getDataFolder();
 
         if (!pluginDataFolder.exists()) pluginDataFolder.mkdir();
 
-        final File file = new File(pluginDataFolder, fileName + ".yml");
-
-
         if (file.exists()) {
 
             final YamlConfiguration configuration = YamlConfiguration.loadConfiguration(file);
 
-            values.entrySet().stream().
-                    filter((entry) -> configuration.isSet(entry.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)).
-                    forEach(configuration::set);
+            file.getConfigObjects().stream().filter(object -> !object.isOptional()).forEach(object -> configuration.set(object.getKey(), object.getValue()));
 
             try {
                 configuration.save(file);
@@ -72,7 +66,7 @@ public class ConfigManager extends HyperManager {
                 e.printStackTrace();
             }
         }
-        else makeConfig(fileName, values);
+        else makeConfig(file);
     }
 
     public YamlConfiguration getConfig(String fileName) throws FileNotFoundException {
