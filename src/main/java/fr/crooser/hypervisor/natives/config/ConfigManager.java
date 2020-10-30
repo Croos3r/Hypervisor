@@ -76,15 +76,9 @@ public class ConfigManager extends HyperManager {
         else makeConfig(file);
     }
 
-    public YamlConfiguration getConfig(String fileName) throws FileNotFoundException {
-
-        final File pluginDataFolder = hypervisor.getPlugin().getDataFolder();
-
-        if (!pluginDataFolder.exists()) pluginDataFolder.mkdir();
-
-        final File file = new File(pluginDataFolder, fileName + ".yml");
+    public YamlConfiguration getConfig(File file) throws FileNotFoundException {
 
         if (file.exists()) return YamlConfiguration.loadConfiguration(file);
-        else throw new FileNotFoundException("Can't find " + fileName + ".yml in plugin's data folder.");
+        else throw new FileNotFoundException("Can't find " + file.getName());
     }
 }
