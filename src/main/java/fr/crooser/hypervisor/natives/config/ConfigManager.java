@@ -61,7 +61,7 @@ public class ConfigManager extends HyperManager {
 
             file.getConfigObjects().forEach(object -> {
 
-                if (!object.isOptional()) {
+                if (!object.isOptional() && !configuration.isSet(object.getPath())) {
 
                     if (!object.isSection()) configuration.set(object.getPath(), object.getValue());
                     else configuration.createSection(object.getPath());
