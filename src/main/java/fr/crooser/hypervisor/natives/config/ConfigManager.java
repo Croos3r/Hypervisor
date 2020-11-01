@@ -40,6 +40,7 @@ public class ConfigManager extends HyperManager {
         if (!file.exists()) {
 
             try {
+                file.getParentFile().mkdirs();
                 file.createNewFile();
                 configuration.save(file);
             } catch (IOException e) {
