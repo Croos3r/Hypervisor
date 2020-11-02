@@ -25,7 +25,7 @@ public class ConfigManager extends HyperManager {
     @Override
     public void init() {
 
-        configFiles.forEach(this::updateConfig);
+        configFiles.forEach(this::makeConfig);
     }
 
     public void makeConfig(ConfigFile file) {
@@ -47,34 +47,6 @@ public class ConfigManager extends HyperManager {
                 e.printStackTrace();
             }
         }
-    }
-
-    public void updateConfig(ConfigFile file) {
-
-        final File pluginDataFolder = hypervisor.getPlugin().getDataFolder();
-
-        if (!pluginDataFolder.exists()) pluginDataFolder.mkdir();
-
-        if (file.exists()) {
-
-            final YamlConfiguration configuration = YamlConfiguration.loadConfiguration(file);
-
-            file.getConfigObjects().forEach(object -> {
-
-                if (!object.isOptional() && !configuration.isSet(object.getPath())) {
-
-                    if (!object.isSection()) configuration.set(object.getPath(), object.getValue());
-                    else configuration.createSection(object.getPath());
-                }
-            });
-
-            try {
-                configuration.save(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        else makeConfig(file);
     }
 
     public YamlConfiguration getConfig(File file) throws FileNotFoundException {
